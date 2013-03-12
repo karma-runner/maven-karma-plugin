@@ -4,7 +4,7 @@
 
     <groupId>com.kelveden.testacular</groupId>
     <artifactId>testacular-maven-plugin</artifactId>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
 
     <properties>
