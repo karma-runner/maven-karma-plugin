@@ -1,4 +1,4 @@
-package com.kelveden.testacular;
+package com.kelveden.plugins.testacular;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
