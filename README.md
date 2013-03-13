@@ -4,6 +4,9 @@ Provides the ability to run tests via [Testacular](http://testacular.github.com/
 
 ## Usage
 
+Note that the plugin expects Testacular (and nodejs of course) to have been installed beforehand and for the `testacular`
+binary to be on the system path.
+
 Example of a typical usage:
 
     <plugin>
