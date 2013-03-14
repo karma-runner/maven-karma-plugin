@@ -39,5 +39,5 @@ information on the arguments available.
 
 ## Contributing
 
-Ideas and bug reports are welcome - pull requests to fix aforementioned bugs even more so! Apart from that,
-there really isn't much to the plugin and I think it's best to keep it that way.
+Bug reports are welcome - pull requests to fix aforementioned bugs even more so! Apart from that,
+there really isn't much to the plugin and I think it's best to keep it that way. Am open to other thoughts on that though.
