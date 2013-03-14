@@ -51,7 +51,7 @@ public class StartMojo extends AbstractMojo {
 
     /**
      * Flag indicating whether the Testacular server will automatically re-run when watched files change. See the "autoWatch"
-     * section of the Testacular online configuration documentation for more information.
+     * section of the Testacular online configuration documentation for more information. Defaults to Testacular default.
      */
     @Parameter(property = "autoWatch", required = false)
     private Boolean autoWatch;
@@ -72,9 +72,9 @@ public class StartMojo extends AbstractMojo {
 
     /**
      * Flag indicating whether the Testacular server will exit after a single test run. See the "singleRun" section of
-     * the Testacular online configuration documentation for more information.
+     * the Testacular online configuration documentation for more information. Defaults to true.
      */
-    @Parameter(property = "singleRun", required = false)
+    @Parameter(property = "singleRun", required = false, defaultValue = "true")
     private Boolean singleRun;
 
     /**
