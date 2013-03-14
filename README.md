@@ -36,3 +36,8 @@ The plugin simply shells out to `testacular`; so the properties you specify in t
 roughly match up with the arguments to Testacular itself. See the Testacular
 [configuration documentation](http://testacular.github.com/0.6.0/config/configuration-file.html) for more
 information on the arguments available.
+
+## Contributing
+
+However, ideas and bug reports are welcome - pull requests to fix aforementioned bugs even more so! Apart from that,
+there really isn't much to the plugin and I think it's best to keep it that way.
