@@ -22,7 +22,6 @@ Example of a typical usage:
         </executions>
         <configuration>
             <browsers>PhantomJS</browsers>
-            <singleRun>true</singleRun>
         </configuration>
     </plugin>
 
@@ -33,9 +32,16 @@ Just run:
     mvn help:describe -Dplugin=com.kelveden.plugins:testacular-maven-plugin -Ddetail
 
 The plugin simply shells out to `testacular`; so the properties you specify in the configuration section will
-roughly match up with the arguments to Testacular itself. See the Testacular
+be passed on as arguments to Testacular itself. See the Testacular
 [configuration documentation](http://testacular.github.com/0.6.0/config/configuration-file.html) for more
 information on the arguments available.
+
+Note that only the subset of `testacular start` arguments that are relevant are supported by the plugin - there's no
+support for the `--port` argument, for example.
+
+Note also that if a property isn't specified in the POM it will not be passed to `testacular start` at all - i.e. Testacular will
+pick the default value for the corresponding argument. The exception to this rule is the "singleRun" property which is
+set to "true" by default as this will be the most common use case in the context of a Maven build.
 
 ## Contributing
 
