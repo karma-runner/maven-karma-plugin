@@ -20,12 +20,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <url>https://github.com/kelveden/maven-karma-plugin</url>
+    <url>https://github.com/karma-runner/maven-karma-plugin</url>
 
     <scm>
-        <connection>scm:git:git@github.com:kelveden/maven-karma-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:kelveden/maven-karma-plugin.git</developerConnection>
-        <url>git@github.com:kelveden/maven-karma-plugin.git</url>
+        <connection>scm:git:git@github.com:karma-runner/maven-karma-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:karma-runner/maven-karma-plugin.git</developerConnection>
+        <url>git@github.com:karma-runner/maven-karma-plugin.git</url>
     </scm>
 
     <developers>
