@@ -84,7 +84,18 @@ public class StartMojo extends AbstractMojo {
     @Parameter(property = "reportSlowerThan", required = false)
     private Integer reportSlowerThan;
 
+    /**
+     * Flag that when set to true indicates that execution of the goal should be skipped.
+     */
+    @Parameter(property = "skipKarma", required = false, defaultValue = "false")
+    private Boolean skipKarma;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
+
+        if (skipKarma) {
+            getLog().info("Skipping execution.");
+            return;
+        }
 
         final Process karma = createKarmaProcess();
 
