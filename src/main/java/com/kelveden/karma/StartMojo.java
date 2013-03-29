@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.kelveden.testacular;
+package com.kelveden.karma;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,105 +31,105 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Executes the 'start' task against Testacular. See the Testacular documentation itself for information: http://testacular.github.com.
+ * Executes the 'start' task against Karma. See the Karma documentation itself for information: http://karma.github.com.
  */
 @Mojo(name = "start", defaultPhase = LifecyclePhase.TEST)
 public class StartMojo extends AbstractMojo {
 
     /**
-     * Path to the Testacular configuration file.
+     * Path to the Karma configuration file.
      */
-    @Parameter(defaultValue = "${basedir}/testacular.conf.js", property = "configFile", required = true)
+    @Parameter(defaultValue = "${basedir}/karma.conf.js", property = "configFile", required = true)
     private File configFile;
 
     /**
-     * Comma-separated list of browsers. See the "browsers" section of the Testacular online configuration documentation for
+     * Comma-separated list of browsers. See the "browsers" section of the Karma online configuration documentation for
      * supported values.
      */
     @Parameter(property = "browsers", required = false)
     private String browsers;
 
     /**
-     * Flag indicating whether the Testacular server will automatically re-run when watched files change. See the "autoWatch"
-     * section of the Testacular online configuration documentation for more information. Defaults to Testacular default.
+     * Flag indicating whether the Karma server will automatically re-run when watched files change. See the "autoWatch"
+     * section of the Karma online configuration documentation for more information. Defaults to Karma default.
      */
     @Parameter(property = "autoWatch", required = false)
     private Boolean autoWatch;
 
     /**
-     * Comma-separated list of reporters. See the "reporters" section of the Testacular online configuration documentation for
+     * Comma-separated list of reporters. See the "reporters" section of the Karma online configuration documentation for
      * supported values.
      */
     @Parameter(property = "reporters", required = false)
     private String reporters;
 
     /**
-     * Browser capture timeout in milliseconds. See the "captureTimeout" section of the Testacular online configuration documentation for
+     * Browser capture timeout in milliseconds. See the "captureTimeout" section of the Karma online configuration documentation for
      * more information.
      */
     @Parameter(property = "captureTimeout", required = false)
     private Integer captureTimeout;
 
     /**
-     * Flag indicating whether the Testacular server will exit after a single test run. See the "singleRun" section of
-     * the Testacular online configuration documentation for more information. Defaults to true.
+     * Flag indicating whether the Karma server will exit after a single test run. See the "singleRun" section of
+     * the Karma online configuration documentation for more information. Defaults to true.
      */
     @Parameter(property = "singleRun", required = false, defaultValue = "true")
     private Boolean singleRun;
 
     /**
      * Threshold (in milliseconds) beyond which slow-running tests will be reported. See the "reportSlowerThan" section
-     * of the Testacular online configuration documentation for more information.
+     * of the Karma online configuration documentation for more information.
      */
     @Parameter(property = "reportSlowerThan", required = false)
     private Integer reportSlowerThan;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        final Process testacular = createTestacularProcess();
+        final Process karma = createKarmaProcess();
 
-        if (!executeTestacular(testacular) && singleRun) {
-            throw new MojoFailureException("There were Testacular test failures.");
+        if (!executeKarma(karma) && singleRun) {
+            throw new MojoFailureException("There were Karma test failures.");
         }
 
         System.out.flush();
     }
 
-    private boolean executeTestacular(final Process testacular) throws MojoExecutionException {
+    private boolean executeKarma(final Process karma) throws MojoExecutionException {
 
-        BufferedReader testacularOutputReader = null;
+        BufferedReader karmaOutputReader = null;
         try {
-            testacularOutputReader = createTestacularOutputReader(testacular);
+            karmaOutputReader = createKarmaOutputReader(karma);
 
-            for (String line = testacularOutputReader.readLine(); line != null; line = testacularOutputReader.readLine()) {
+            for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
                 System.out.println(line);
             }
 
-            return (testacular.waitFor() == 0);
+            return (karma.waitFor() == 0);
 
         } catch (IOException e) {
-            throw new MojoExecutionException("There was an error reading the output from Testacular.", e);
+            throw new MojoExecutionException("There was an error reading the output from Karma.", e);
 
         } catch (InterruptedException e) {
-            throw new MojoExecutionException("The Testacular process was interrupted.", e);
+            throw new MojoExecutionException("The Karma process was interrupted.", e);
 
         } finally {
-            IOUtils.closeQuietly(testacularOutputReader);
+            IOUtils.closeQuietly(karmaOutputReader);
         }
     }
 
-    private Process createTestacularProcess() throws MojoExecutionException {
+    private Process createKarmaProcess() throws MojoExecutionException {
 
-        final ProcessBuilder builder = new ProcessBuilder("testacular", "start", configFile.getAbsolutePath());
+        final ProcessBuilder builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
 
         final List<String> command = builder.command();
 
-        command.addAll(valueToTestacularArgument(browsers, "--browsers"));
-        command.addAll(valueToTestacularArgument(reporters, "--reporters"));
-        command.addAll(valueToTestacularArgument(singleRun, "--single-run", "--no-single-run"));
-        command.addAll(valueToTestacularArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
-        command.addAll(valueToTestacularArgument(captureTimeout, "--capture-timeout"));
-        command.addAll(valueToTestacularArgument(reportSlowerThan, "--report-slower-than"));
+        command.addAll(valueToKarmaArgument(browsers, "--browsers"));
+        command.addAll(valueToKarmaArgument(reporters, "--reporters"));
+        command.addAll(valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
+        command.addAll(valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
+        command.addAll(valueToKarmaArgument(captureTimeout, "--capture-timeout"));
+        command.addAll(valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
 
         builder.redirectErrorStream(true);
 
@@ -140,11 +140,11 @@ public class StartMojo extends AbstractMojo {
             return builder.start();
 
         } catch (IOException e) {
-            throw new MojoExecutionException("There was an error executing Testacular.", e);
+            throw new MojoExecutionException("There was an error executing Karma.", e);
         }
     }
 
-    private List<String> valueToTestacularArgument(final Boolean value, final String trueSwitch, final String falseSwitch) {
+    private List<String> valueToKarmaArgument(final Boolean value, final String trueSwitch, final String falseSwitch) {
         if (value == null) {
             return Collections.EMPTY_LIST;
         }
@@ -156,7 +156,7 @@ public class StartMojo extends AbstractMojo {
         }
     }
 
-    private List<String> valueToTestacularArgument(final Integer value, final String argName) {
+    private List<String> valueToKarmaArgument(final Integer value, final String argName) {
         if (value == null) {
             return Collections.EMPTY_LIST;
         }
@@ -164,7 +164,7 @@ public class StartMojo extends AbstractMojo {
         return Arrays.asList(argName, String.valueOf(value));
     }
 
-    private List<String> valueToTestacularArgument(final String value, final String argName) {
+    private List<String> valueToKarmaArgument(final String value, final String argName) {
         if (value == null) {
             return Collections.EMPTY_LIST;
         }
@@ -172,7 +172,7 @@ public class StartMojo extends AbstractMojo {
         return Arrays.asList(argName, value);
     }
 
-    private BufferedReader createTestacularOutputReader(final Process p)
+    private BufferedReader createKarmaOutputReader(final Process p)
     {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
