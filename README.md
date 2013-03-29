@@ -1,4 +1,6 @@
 # maven-karma-plugin
+> **IMPORTANT**: This plugin still has to make it into Maven Central - watch this space!
+
 > Note that this plugin began life as the [testacular-maven-plugin](https://github.com/kelveden/testacular-maven-plugin). Since Testacular itself has changed name to Karma, all subsequent development
 of the plugin will be in its new form.
 
