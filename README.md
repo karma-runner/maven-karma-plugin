@@ -33,7 +33,7 @@ Example of a typical usage:
 
 Just run:
 
-    mvn help:describe -Dplugin=com.kelveden.plugins:maven-karma-plugin -Ddetail
+    mvn help:describe -Dplugin=com.kelveden:maven-karma-plugin -Ddetail
 
 The plugin simply shells out to `karma`; so the properties you specify in the configuration section will
 be passed on as arguments to Karma itself. See the Karma
