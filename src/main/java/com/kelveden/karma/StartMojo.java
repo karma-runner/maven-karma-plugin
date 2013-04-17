@@ -42,6 +42,9 @@ public class StartMojo extends AbstractMojo {
     @Parameter(defaultValue = "${basedir}/karma.conf.js", property = "configFile", required = true)
     private File configFile;
 
+    @Parameter(defaultValue = "karma", property="karmaExecuteablePath", required=false)
+    private String karmaExecutablePath;
+
     /**
      * Comma-separated list of browsers. See the "browsers" section of the Karma online configuration documentation for
      * supported values.
@@ -131,7 +134,7 @@ public class StartMojo extends AbstractMojo {
 
     private Process createKarmaProcess() throws MojoExecutionException {
 
-        final ProcessBuilder builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
+        final ProcessBuilder builder = new ProcessBuilder(karmaExecutablePath, "start", configFile.getAbsolutePath());
 
         final List<String> command = builder.command();
 
