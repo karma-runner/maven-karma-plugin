@@ -131,7 +131,13 @@ public class StartMojo extends AbstractMojo {
 
     private Process createKarmaProcess() throws MojoExecutionException {
 
-        final ProcessBuilder builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
+        final ProcessBuilder builder;
+
+        if (isWindows()) {
+          builder = new ProcessBuilder("cmd", "/C", "karma", "start", configFile.getAbsolutePath());
+        } else {
+          builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
+        }
 
         final List<String> command = builder.command();
 
@@ -187,5 +193,9 @@ public class StartMojo extends AbstractMojo {
     {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
+
+  private boolean isWindows() {
+    return System.getProperty("os.name").toLowerCase().contains("windows");
+  }
 
 }
