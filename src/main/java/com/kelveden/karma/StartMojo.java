@@ -90,6 +90,13 @@ public class StartMojo extends AbstractMojo {
     @Parameter(property = "skipKarma", required = false, defaultValue = "false")
     private Boolean skipKarma;
 
+    /**
+     * Flag that when set to to true ensures that the Maven build does not fail when if the Karma tests fail. As
+     * for the similar property on the maven-surefire-plugin: its use is not recommended, but quite convenient on occasion.
+     */
+    @Parameter(property = "karmaFailureIgnore", required = false, defaultValue = "false")
+    private Boolean karmaFailureIgnore;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (skipKarma) {
@@ -100,7 +107,11 @@ public class StartMojo extends AbstractMojo {
         final Process karma = createKarmaProcess();
 
         if (!executeKarma(karma) && singleRun) {
-            throw new MojoFailureException("There were Karma test failures.");
+            if (karmaFailureIgnore) {
+                getLog().warn("There were Karma test failures.");
+            } else {
+                throw new MojoFailureException("There were Karma test failures.");
+            }
         }
 
         System.out.flush();
