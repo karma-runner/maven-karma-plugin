@@ -45,6 +45,15 @@ Note also that if a property isn't specified in the POM it will not be passed to
 pick the default value for the corresponding argument. The exception to this rule is the "singleRun" property which is
 set to "true" by default as this will be the most common use case in the context of a Maven build.
 
+## Releases
+
+### Version 1.0
+   * Initial release.
+
+### Version 1.1
+   * Support for Windows, courtesy of [@Nikku](https://github.com/Nikku). _Closes issues #3, #5, #6._
+   * New karmaFailureIgnore property that acts in a similar way to the maven-surefire-plugin testFailureIgnore property. _Closes issue #4._
+
 ## Contributing
 
 Bug reports are welcome - pull requests to fix aforementioned bugs even more so! Apart from that,
