@@ -14,7 +14,7 @@ Example of a typical usage:
     <plugin>
         <groupId>com.kelveden</groupId>
         <artifactId>maven-karma-plugin</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
         <executions>
             <execution>
                 <goals>
