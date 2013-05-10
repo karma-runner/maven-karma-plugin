@@ -85,10 +85,20 @@ public class StartMojo extends AbstractMojo {
     private Integer reportSlowerThan;
 
     /**
-     * Flag that when set to true indicates that execution of the goal should be skipped.
+     * Flag that when set to true indicates that execution of the goal should be skipped. Note that setting this property
+     * will skip Karma tests *only*. If you also want to skip tests such as those run by the maven-surefire-plugin, consider
+     * using the skipTests property instead.
      */
     @Parameter(property = "skipKarma", required = false, defaultValue = "false")
     private Boolean skipKarma;
+
+    /**
+     * Flag that when set to true indicates that execution of the goal should be skipped. Note that setting this property
+     * also has the effect of skipping tests under plugins such as the maven-surefire-plugin. If you want to *just* skip
+     * Karma tests, use the skipKarma property instead.
+     */
+    @Parameter(property = "skipTests", required = false, defaultValue = "false")
+    private Boolean skipTests;
 
     /**
      * Flag that when set to to true ensures that the Maven build does not fail when if the Karma tests fail. As
@@ -99,7 +109,7 @@ public class StartMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        if (skipKarma) {
+        if (skipKarma || skipTests) {
             getLog().info("Skipping execution.");
             return;
         }
