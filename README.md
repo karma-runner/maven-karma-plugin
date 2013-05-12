@@ -47,12 +47,15 @@ set to "true" by default as this will be the most common use case in the context
 
 ## Releases
 
-### Version 1.0
-   * Initial release.
+### Version 1.2
+   * Support for skipTests.
 
 ### Version 1.1
    * Support for Windows, courtesy of [@Nikku](https://github.com/Nikku). _Closes issues #3, #5, #6._
    * New karmaFailureIgnore property that acts in a similar way to the maven-surefire-plugin testFailureIgnore property. _Closes issue #4._
+
+### Version 1.0
+   * Initial release.
 
 ## Contributing
 
