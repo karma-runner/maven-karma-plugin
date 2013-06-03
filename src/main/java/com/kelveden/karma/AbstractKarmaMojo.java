@@ -15,8 +15,15 @@
  */
 package com.kelveden.karma;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.plexus.util.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  *
@@ -44,5 +51,49 @@ public abstract class AbstractKarmaMojo extends AbstractMojo {
      */
     @Parameter(property = "karmaFailureIgnore", required = false, defaultValue = "false")
     protected Boolean karmaFailureIgnore;
+
+    protected BufferedReader createKarmaOutputReader(final Process p) {
+        return new BufferedReader(new InputStreamReader(p.getInputStream()));
+    }
+
+    protected boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("windows");
+    }
+
+    protected boolean executeKarma(final Process karma) throws MojoExecutionException {
+        BufferedReader karmaOutputReader = null;
+        try {
+            karmaOutputReader = createKarmaOutputReader(karma);
+
+            for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
+                System.out.println(line);
+            }
+
+            return (karma.waitFor() == 0);
+
+        } catch (IOException e) {
+            throw new MojoExecutionException("There was an error reading the output from Karma.", e);
+
+        } catch (InterruptedException e) {
+            throw new MojoExecutionException("The Karma process was interrupted.", e);
+
+        } finally {
+            IOUtils.closeQuietly(karmaOutputReader);
+        }
+    }
+
+    protected Process startKarmaProcess(ProcessBuilder builder) throws MojoExecutionException {
+        try {
+            builder.redirectErrorStream(true);
+
+            System.out.println(StringUtils.join(builder.command().iterator(), " "));
+
+            return builder.start();
+
+        } catch (IOException e) {
+            throw new MojoExecutionException("There was an error executing Karma.", e);
+        }
+    }
+
 
 }

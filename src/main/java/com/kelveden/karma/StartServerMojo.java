@@ -75,8 +75,6 @@ public class StartServerMojo extends AbstractStartMojo {
             builder.command("bash", "-l", "-c", "`" + StringUtils.join(command.iterator(), " ") + " 2>out.log" + " 1>out.log" + " &`");
         }
 
-        builder.redirectErrorStream(true);
-
         return startKarmaProcess(builder);
     }
 

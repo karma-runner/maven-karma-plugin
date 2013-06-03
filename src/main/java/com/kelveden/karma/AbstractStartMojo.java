@@ -75,17 +75,6 @@ public abstract class AbstractStartMojo extends AbstractKarmaMojo {
     @Parameter(property = "reportSlowerThan", required = false)
     protected Integer reportSlowerThan;
 
-    protected Process startKarmaProcess(ProcessBuilder builder) throws MojoExecutionException {
-        try {
-
-            System.out.println(StringUtils.join(builder.command().iterator(), " "));
-
-            return builder.start();
-
-        } catch (IOException e) {
-            throw new MojoExecutionException("There was an error executing Karma.", e);
-        }
-    }
 
     protected void addKarmaArguments(List<String> command) {
         command.addAll(valueToKarmaArgument(browsers, "--browsers"));
@@ -93,29 +82,6 @@ public abstract class AbstractStartMojo extends AbstractKarmaMojo {
         command.addAll(valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
         command.addAll(valueToKarmaArgument(captureTimeout, "--capture-timeout"));
         command.addAll(valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
-    }
-
-    protected boolean executeKarma(final Process karma) throws MojoExecutionException {
-
-        BufferedReader karmaOutputReader = null;
-        try {
-            karmaOutputReader = createKarmaOutputReader(karma);
-
-            for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
-                System.out.println(line);
-            }
-
-            return (karma.waitFor() == 0);
-
-        } catch (IOException e) {
-            throw new MojoExecutionException("There was an error reading the output from Karma.", e);
-
-        } catch (InterruptedException e) {
-            throw new MojoExecutionException("The Karma process was interrupted.", e);
-
-        } finally {
-            IOUtils.closeQuietly(karmaOutputReader);
-        }
     }
 
     protected List<String> valueToKarmaArgument(final Boolean value, final String trueSwitch, final String falseSwitch) {
@@ -146,11 +112,5 @@ public abstract class AbstractStartMojo extends AbstractKarmaMojo {
         return Arrays.asList(argName, value);
     }
 
-    protected BufferedReader createKarmaOutputReader(final Process p) {
-        return new BufferedReader(new InputStreamReader(p.getInputStream()));
-    }
 
-    protected boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("windows");
-    }
 }

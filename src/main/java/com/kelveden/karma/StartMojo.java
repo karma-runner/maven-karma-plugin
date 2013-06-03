@@ -78,8 +78,6 @@ public class StartMojo extends AbstractStartMojo {
         command.addAll(valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
         addKarmaArguments(command);
 
-        builder.redirectErrorStream(true);
-
         return startKarmaProcess(builder);
     }
 

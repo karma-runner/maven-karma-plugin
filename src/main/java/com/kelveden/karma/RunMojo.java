@@ -15,21 +15,11 @@
  */
 package com.kelveden.karma;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.plexus.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -59,28 +49,6 @@ public class RunMojo extends AbstractKarmaMojo {
         System.out.flush();
     }
 
-    private boolean executeKarma(final Process karma) throws MojoExecutionException {
-
-        BufferedReader karmaOutputReader = null;
-        try {
-            karmaOutputReader = createKarmaOutputReader(karma);
-
-            for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
-                System.out.println(line);
-            }
-
-            return (karma.waitFor() == 0);
-
-        } catch (IOException e) {
-            throw new MojoExecutionException("There was an error reading the output from Karma.", e);
-
-        } catch (InterruptedException e) {
-            throw new MojoExecutionException("The Karma process was interrupted.", e);
-
-        } finally {
-            IOUtils.closeQuietly(karmaOutputReader);
-        }
-    }
 
     private Process createKarmaProcess() throws MojoExecutionException {
 
@@ -92,27 +60,6 @@ public class RunMojo extends AbstractKarmaMojo {
             builder = new ProcessBuilder("karma", "run");
         }
 
-        final List<String> command = builder.command();
-
-        builder.redirectErrorStream(true);
-
-        try {
-
-            System.out.println(StringUtils.join(command.iterator(), " "));
-
-            return builder.start();
-
-        } catch (IOException e) {
-            throw new MojoExecutionException("There was an error executing Karma.", e);
-        }
+        return startKarmaProcess(builder);
     }
-
-    private BufferedReader createKarmaOutputReader(final Process p) {
-        return new BufferedReader(new InputStreamReader(p.getInputStream()));
-    }
-
-    private boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("windows");
-    }
-
 }
