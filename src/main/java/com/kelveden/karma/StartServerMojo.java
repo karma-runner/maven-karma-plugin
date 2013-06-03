@@ -15,33 +15,20 @@
  */
 package com.kelveden.karma;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Executes the 'start' task against Karma. See the Karma documentation itself for information: http://karma.github.com.
+ * Executes the 'start' task against Karma and keeps the process in background. Should be used together with the 'run' goal.
+ * See the Karma documentation itself for information: http://karma.github.com.
  */
-@Mojo(name = "start", defaultPhase = LifecyclePhase.TEST)
-public class StartMojo extends AbstractStartMojo {
-
-    /**
-     * Flag indicating whether the Karma server will exit after a single test run. See the "singleRun" section of
-     * the Karma online configuration documentation for more information. Defaults to true.
-     */
-    @Parameter(property = "singleRun", required = false, defaultValue = "true")
-    private Boolean singleRun;
+@Mojo(name = "startServer", defaultPhase = LifecyclePhase.INITIALIZE)
+public class StartServerMojo extends AbstractStartMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -50,33 +37,43 @@ public class StartMojo extends AbstractStartMojo {
             return;
         }
 
-        final Process karma = createKarmaProcess();
+        killNodeProcesses();
 
-        if (!executeKarma(karma) && singleRun) {
-            if (karmaFailureIgnore) {
-                getLog().warn("There were Karma test failures.");
-            } else {
-                throw new MojoFailureException("There were Karma test failures.");
-            }
-        }
+        final Process karma = createKarmaProcess();
+        executeKarma(karma);
 
         System.out.flush();
     }
 
+    private void killNodeProcesses() throws MojoExecutionException {
+        try {
+            ProcessBuilder killall;
+            if (isWindows()) {
+                killall = new ProcessBuilder("cmd", "/C", "taskkill /f /im node.exe");
+            } else {
+                killall = new ProcessBuilder("killall", "-v", "node");
+            }
+            killall.start().waitFor();
+        } catch (Exception e) {
+            throw new MojoExecutionException("There was an error killing all node processes", e);
+        }
+    }
+
     private Process createKarmaProcess() throws MojoExecutionException {
 
-        final ProcessBuilder builder;
-
-        if (isWindows()) {
-            builder = new ProcessBuilder("cmd", "/C", "karma", "start", configFile.getAbsolutePath());
-        } else {
-            builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
-        }
+        final ProcessBuilder builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
 
         final List<String> command = builder.command();
+        command.add("--no-single-run");
 
-        command.addAll(valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
         addKarmaArguments(command);
+
+
+        if (isWindows()) {
+            builder.command("cmd", "/C", "start", "/min", StringUtils.join(command.iterator(), " "));
+        } else {
+            builder.command("bash", "-l", "-c", "`" + StringUtils.join(command.iterator(), " ") + " 2>out.log" + " 1>out.log" + " &`");
+        }
 
         return startKarmaProcess(builder);
     }
