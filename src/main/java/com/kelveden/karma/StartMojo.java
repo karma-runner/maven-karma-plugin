@@ -24,6 +24,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
+import org.fusesource.jansi.Ansi;
 
 import java.io.*;
 import java.util.Arrays;
@@ -134,7 +135,7 @@ public class StartMojo extends AbstractMojo {
             karmaOutputReader = createKarmaOutputReader(karma);
 
             for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
-                System.out.println(line);
+                System.out.println(Ansi.ansi().a(line).reset());
             }
 
             return (karma.waitFor() == 0);
