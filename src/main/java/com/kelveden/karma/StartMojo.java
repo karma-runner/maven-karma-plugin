@@ -24,7 +24,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
-import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.*;
 import java.util.Arrays;
@@ -135,8 +135,12 @@ public class StartMojo extends AbstractMojo {
             karmaOutputReader = createKarmaOutputReader(karma);
 
             for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
-                System.out.println(Ansi.ansi().a(line).reset());
+                AnsiConsole.out.println(line);
             }
+
+            //Reset the colors
+            AnsiConsole.out.println("\033[0m ");
+            AnsiConsole.systemUninstall();
 
             return (karma.waitFor() == 0);
 
@@ -173,6 +177,7 @@ public class StartMojo extends AbstractMojo {
         builder.redirectErrorStream(true);
 
         try {
+            AnsiConsole.systemInstall();
 
             System.out.println(StringUtils.join(command.iterator(), " "));
 
