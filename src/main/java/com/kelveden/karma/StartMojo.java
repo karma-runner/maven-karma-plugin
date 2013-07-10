@@ -138,16 +138,16 @@ public class StartMojo extends AbstractMojo {
                 AnsiConsole.out.println(line);
             }
 
-            //Reset the colors
-            AnsiConsole.out.println("\033[0m ");
-            AnsiConsole.systemUninstall();
+            resetAnsiConsole();
 
             return (karma.waitFor() == 0);
 
         } catch (IOException e) {
+            resetAnsiConsole();
             throw new MojoExecutionException("There was an error reading the output from Karma.", e);
 
         } catch (InterruptedException e) {
+            resetAnsiConsole();
             throw new MojoExecutionException("The Karma process was interrupted.", e);
 
         } finally {
@@ -184,6 +184,7 @@ public class StartMojo extends AbstractMojo {
             return builder.start();
 
         } catch (IOException e) {
+            resetAnsiConsole();
             throw new MojoExecutionException("There was an error executing Karma.", e);
         }
     }
@@ -221,8 +222,13 @@ public class StartMojo extends AbstractMojo {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
 
-  private boolean isWindows() {
-    return System.getProperty("os.name").toLowerCase().contains("windows");
-  }
+    private boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("windows");
+    }
+
+    private void resetAnsiConsole() {
+        AnsiConsole.out.println("\033[0m ");
+        AnsiConsole.systemInstall();
+    }
 
 }
