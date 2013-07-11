@@ -86,6 +86,12 @@ public class StartMojo extends AbstractMojo {
     private Integer reportSlowerThan;
 
     /**
+     * Override the colors flag to enable/disable karma colors output present in the karma configuration file
+     */
+    @Parameter(property = "colors", required = false)
+    private Boolean colors;
+
+    /**
      * Flag that when set to true indicates that execution of the goal should be skipped. Note that setting this property
      * will skip Karma tests *only*. If you also want to skip tests such as those run by the maven-surefire-plugin, consider
      * using the skipTests property instead.
@@ -135,7 +141,8 @@ public class StartMojo extends AbstractMojo {
             karmaOutputReader = createKarmaOutputReader(karma);
 
             for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
-                AnsiConsole.out.println(line);
+                AnsiConsole.out.print(line);
+                AnsiConsole.out.println("\033[0m ");
             }
 
             resetAnsiConsole();
@@ -173,6 +180,7 @@ public class StartMojo extends AbstractMojo {
         command.addAll(valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
         command.addAll(valueToKarmaArgument(captureTimeout, "--capture-timeout"));
         command.addAll(valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
+        command.addAll(valueToKarmaArgument(colors, "--colors"));
 
         builder.redirectErrorStream(true);
 
@@ -207,6 +215,14 @@ public class StartMojo extends AbstractMojo {
         }
 
         return Arrays.asList(argName, String.valueOf(value));
+    }
+
+    private List<String> valueToKarmaArgument(final Boolean value, final String argName) {
+        if (value == null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        return Arrays.asList(argName, value.toString());
     }
 
     private List<String> valueToKarmaArgument(final String value, final String argName) {
