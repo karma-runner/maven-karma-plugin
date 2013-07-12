@@ -86,9 +86,9 @@ public class StartMojo extends AbstractMojo {
     private Integer reportSlowerThan;
 
     /**
-     * Override the colors flag to enable/disable karma colors output present in the karma configuration file
+     * Override the colors flag to enable/disable karma colors output present in the karma configuration file. Defaults to false.
      */
-    @Parameter(property = "colors", required = false)
+    @Parameter(property = "colors", required = false, defaultValue = "false")
     private Boolean colors;
 
     /**
