@@ -24,6 +24,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
+import org.fusesource.jansi.AnsiConsole;
 
 import java.io.*;
 import java.util.Arrays;
@@ -85,6 +86,12 @@ public class StartMojo extends AbstractMojo {
     private Integer reportSlowerThan;
 
     /**
+     * Override the colors flag to enable/disable karma colors output present in the karma configuration file
+     */
+    @Parameter(property = "colors", required = false)
+    private Boolean colors;
+
+    /**
      * Flag that when set to true indicates that execution of the goal should be skipped. Note that setting this property
      * will skip Karma tests *only*. If you also want to skip tests such as those run by the maven-surefire-plugin, consider
      * using the skipTests property instead.
@@ -134,15 +141,20 @@ public class StartMojo extends AbstractMojo {
             karmaOutputReader = createKarmaOutputReader(karma);
 
             for (String line = karmaOutputReader.readLine(); line != null; line = karmaOutputReader.readLine()) {
-                System.out.println(line);
+                AnsiConsole.out.print(line);
+                AnsiConsole.out.println("\033[0m ");
             }
+
+            resetAnsiConsole();
 
             return (karma.waitFor() == 0);
 
         } catch (IOException e) {
+            resetAnsiConsole();
             throw new MojoExecutionException("There was an error reading the output from Karma.", e);
 
         } catch (InterruptedException e) {
+            resetAnsiConsole();
             throw new MojoExecutionException("The Karma process was interrupted.", e);
 
         } finally {
@@ -168,16 +180,19 @@ public class StartMojo extends AbstractMojo {
         command.addAll(valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
         command.addAll(valueToKarmaArgument(captureTimeout, "--capture-timeout"));
         command.addAll(valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
+        command.addAll(valueToKarmaArgument(colors, "--colors"));
 
         builder.redirectErrorStream(true);
 
         try {
+            AnsiConsole.systemInstall();
 
             System.out.println(StringUtils.join(command.iterator(), " "));
 
             return builder.start();
 
         } catch (IOException e) {
+            resetAnsiConsole();
             throw new MojoExecutionException("There was an error executing Karma.", e);
         }
     }
@@ -202,6 +217,14 @@ public class StartMojo extends AbstractMojo {
         return Arrays.asList(argName, String.valueOf(value));
     }
 
+    private List<String> valueToKarmaArgument(final Boolean value, final String argName) {
+        if (value == null) {
+            return Collections.EMPTY_LIST;
+        }
+
+        return Arrays.asList(argName, value.toString());
+    }
+
     private List<String> valueToKarmaArgument(final String value, final String argName) {
         if (value == null) {
             return Collections.EMPTY_LIST;
@@ -215,8 +238,13 @@ public class StartMojo extends AbstractMojo {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
 
-  private boolean isWindows() {
-    return System.getProperty("os.name").toLowerCase().contains("windows");
-  }
+    private boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("windows");
+    }
+
+    private void resetAnsiConsole() {
+        AnsiConsole.out.println("\033[0m ");
+        AnsiConsole.systemInstall();
+    }
 
 }
