@@ -47,6 +47,9 @@ set to "true" by default as this will be the most common use case in the context
 
 ## Releases
 
+### Version 1.3
+   * Support for specifying --colors/--no-colors via new "colors" property; courtesy of [@fbengrid](https://github.com/fbengrid).
+
 ### Version 1.2
    * Support for skipTests.
 
