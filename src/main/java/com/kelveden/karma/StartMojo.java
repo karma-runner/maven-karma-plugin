@@ -114,6 +114,9 @@ public class StartMojo extends AbstractMojo {
     @Parameter(property = "karmaFailureIgnore", required = false, defaultValue = "false")
     private Boolean karmaFailureIgnore;
 
+    @Parameter(property = "karmaExecutable", required = false, defaultValue = "karma")
+    private String karmaExecutable;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (skipKarma || skipTests) {
@@ -167,9 +170,9 @@ public class StartMojo extends AbstractMojo {
         final ProcessBuilder builder;
 
         if (isWindows()) {
-          builder = new ProcessBuilder("cmd", "/C", "karma", "start", configFile.getAbsolutePath());
+          builder = new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFile.getAbsolutePath());
         } else {
-          builder = new ProcessBuilder("karma", "start", configFile.getAbsolutePath());
+          builder = new ProcessBuilder(karmaExecutable, "start", configFile.getAbsolutePath());
         }
 
         final List<String> command = builder.command();
