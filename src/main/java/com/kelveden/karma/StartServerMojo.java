@@ -21,6 +21,9 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -71,11 +74,20 @@ public class StartServerMojo extends AbstractStartMojo {
 
         if (isWindows()) {
             builder.command("cmd", "/C", "start", "/min", StringUtils.join(command.iterator(), " "));
+            return startKarmaProcess(builder);
         } else {
-            builder.command("bash", "-l", "-c", "`" + StringUtils.join(command.iterator(), " ") + " 2>out.log" + " 1>out.log" + " &`");
+            try {
+                BufferedWriter out = new BufferedWriter(new FileWriter("start_karma.sh"));
+                out.write(StringUtils.join(command.iterator(), " ") + " 2>out.log" + " 1>out.log" + " &");
+                out.close();
+                new ProcessBuilder("bash", "-l", "-c", "chmod +x start_karma.sh").start().waitFor();
+                return startKarmaProcess(new ProcessBuilder("bash", "-l", "-c", "./start_karma.sh"));
+            } catch (IOException e) {
+                throw new MojoExecutionException("",e);
+            } catch (InterruptedException e) {
+                throw new MojoExecutionException("",e);
+            }
         }
-
-        return startKarmaProcess(builder);
     }
 
 
