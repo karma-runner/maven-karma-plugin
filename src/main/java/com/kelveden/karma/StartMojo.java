@@ -44,6 +44,12 @@ public class StartMojo extends AbstractMojo {
     private File configFile;
 
     /**
+     * Path to the working directory.  The working directory should be where node_modules is installed.
+     */
+    @Parameter(defaultValue = "${basedir}", property = "nodeModulePath", required = false)
+    private File workingDirectory;
+
+    /**
      * Comma-separated list of browsers. See the "browsers" section of the Karma online configuration documentation for
      * supported values.
      */
@@ -173,6 +179,10 @@ public class StartMojo extends AbstractMojo {
           builder = new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFile.getAbsolutePath());
         } else {
           builder = new ProcessBuilder(karmaExecutable, "start", configFile.getAbsolutePath());
+        }
+
+        if(workingDirectory != null) {
+          builder.directory(workingDirectory);
         }
 
         final List<String> command = builder.command();
