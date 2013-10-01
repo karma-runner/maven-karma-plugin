@@ -18,7 +18,6 @@ package com.kelveden.karma;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -26,7 +25,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +38,12 @@ import java.util.List;
  */
 @Mojo(name = "start", defaultPhase = LifecyclePhase.TEST)
 public class StartMojo extends AbstractMojo {
+
+    /**
+     * Base directory where any Karma reports are written to.
+     */
+    @Parameter(defaultValue = "${project.build.directory}/karma-reports", required = false)
+    private File reportsDirectory;
 
     /**
      * Path to the Karma configuration file.
@@ -176,13 +184,13 @@ public class StartMojo extends AbstractMojo {
         final ProcessBuilder builder;
 
         if (isWindows()) {
-          builder = new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFile.getAbsolutePath());
+            builder = new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFile.getAbsolutePath());
         } else {
-          builder = new ProcessBuilder(karmaExecutable, "start", configFile.getAbsolutePath());
+            builder = new ProcessBuilder(karmaExecutable, "start", configFile.getAbsolutePath());
         }
 
-        if(workingDirectory != null) {
-          builder.directory(workingDirectory);
+        if (workingDirectory != null) {
+            builder.directory(workingDirectory);
         }
 
         final List<String> command = builder.command();
@@ -246,8 +254,7 @@ public class StartMojo extends AbstractMojo {
         return Arrays.asList(argName, value);
     }
 
-    private BufferedReader createKarmaOutputReader(final Process p)
-    {
+    private BufferedReader createKarmaOutputReader(final Process p) {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
 
