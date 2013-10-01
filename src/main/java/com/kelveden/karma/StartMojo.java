@@ -30,8 +30,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -217,13 +215,7 @@ public class StartMojo extends AbstractMojo {
     }
 
     private Process createKarmaProcess() throws MojoExecutionException {
-        final ProcessBuilder builder;
-
-        if (isWindows()) {
-            builder = new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFile.getAbsolutePath());
-        } else {
-            builder = new ProcessBuilder(karmaExecutable, "start", configFile.getAbsolutePath());
-        }
+        final ProcessBuilder builder = KarmaUtils.getKarmaProcessBuilder(karmaExecutable, configFile.getAbsolutePath());
 
         if (workingDirectory != null) {
             builder.directory(workingDirectory);
@@ -231,13 +223,13 @@ public class StartMojo extends AbstractMojo {
 
         final List<String> command = builder.command();
 
-        command.addAll(valueToKarmaArgument(browsers, "--browsers"));
-        command.addAll(valueToKarmaArgument(reporters, "--reporters"));
-        command.addAll(valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
-        command.addAll(valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
-        command.addAll(valueToKarmaArgument(captureTimeout, "--capture-timeout"));
-        command.addAll(valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
-        command.addAll(valueToKarmaArgument(colors, "--colors"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(browsers, "--browsers"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(reporters, "--reporters"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(captureTimeout, "--capture-timeout"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(colors, "--colors"));
 
         builder.redirectErrorStream(true);
 
@@ -253,46 +245,6 @@ public class StartMojo extends AbstractMojo {
             resetAnsiConsole();
             throw new MojoExecutionException("There was an error executing Karma.", e);
         }
-    }
-
-    private boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("windows");
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<String> valueToKarmaArgument(final Boolean value, final String trueSwitch, final String falseSwitch) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(value ? trueSwitch : falseSwitch);
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<String> valueToKarmaArgument(final Integer value, final String argName) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(argName, String.valueOf(value));
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<String> valueToKarmaArgument(final Boolean value, final String argName) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(argName, value.toString());
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<String> valueToKarmaArgument(final String value, final String argName) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(argName, value);
     }
 
     private boolean executeKarma(final Process karma) throws MojoExecutionException {
