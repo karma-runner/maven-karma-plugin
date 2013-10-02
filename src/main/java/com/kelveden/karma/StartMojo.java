@@ -167,6 +167,7 @@ public class StartMojo extends AbstractMojo {
             if (karmaFailureIgnore) {
                 getLog().warn("There were Karma test failures.");
             } else {
+                postExecution();
                 throw new MojoFailureException("There were Karma test failures.");
             }
         }
