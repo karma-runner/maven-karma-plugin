@@ -14,7 +14,7 @@ Example of a typical usage:
     <plugin>
         <groupId>com.kelveden</groupId>
         <artifactId>maven-karma-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.3</version>
         <executions>
             <execution>
                 <goals>
@@ -27,6 +27,36 @@ Example of a typical usage:
         </configuration>
     </plugin>
 
+Full Example:
+
+    <plugin>
+        <groupId>com.kelveden</groupId>
+        <artifactId>maven-karma-plugin</artifactId>
+        <version>1.3</version>
+        <executions>
+            <execution>
+                <phase>test</phase>
+                <goals>
+                    <goal>start</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <configFile>src/main/webapp/resources/karma-0.10.2.conf.js</configFile>
+            <junitReportFile>src/main/webapp/resources/test-results.xml</junitReportFile>
+            <reportsDirectory>${project.build.directory}/karma-reports</reportsDirectory>
+            <browsers>PhantomJS</browsers>
+            <autoWatch>false</autoWatch>
+            <singleRun>true</singleRun>
+            <colors>true</colors>
+            <skipKarma>false</skipKarma>
+            <skipTests>false</skipTests>
+            <karmaFailureIgnore>false</karmaFailureIgnore>
+            <reporters>dots,junit</reporters>
+        </configuration>
+    </plugin>
+
+
 ## More information
 
 Just run:
@@ -35,7 +65,7 @@ Just run:
 
 The plugin simply shells out to `karma`; so the properties you specify in the configuration section will
 be passed on as arguments to Karma itself. See the Karma
-[configuration documentation](http://karma-runner.github.com/0.8/config/configuration-file.html) for more
+[configuration documentation](http://karma-runner.github.com/0.10/config/configuration-file.html) for more
 information on the arguments available.
 
 Note that only the subset of `karma start` arguments that are relevant are supported by the plugin - there's no

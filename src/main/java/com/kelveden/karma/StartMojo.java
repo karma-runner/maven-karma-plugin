@@ -15,10 +15,10 @@
  */
 package com.kelveden.karma;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -26,9 +26,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**
@@ -38,10 +39,38 @@ import java.util.List;
 public class StartMojo extends AbstractMojo {
 
     /**
+     * Name of the Junit reporter for the Karma configuration reporters array
+     *
+     * @see <a href="https://github.com/karma-runner/karma-junit-reporter">https://github.com/karma-runner/karma-junit-reporter</a>}
+     */
+    private static final String KARMA_JUNIT_REPORTER = "junit";
+
+    /**
+     * Name of the Junit reporter plugin for the Karma configuration plugins array
+     *
+     * @see <a href="https://github.com/karma-runner/karma-junit-reporter">https://github.com/karma-runner/karma-junit-reporter</a>}
+     */
+    private static final String KARMA_JUNIT_REPORTER_PLUGIN = "karma-junit-reporter";
+
+    /**
+     * Base directory where all Karma reports are written to.
+     */
+    @Parameter(defaultValue = "${project.build.directory}/karma-reports", required = false)
+    private File reportsDirectory;
+
+    /**
      * Path to the Karma configuration file.
      */
     @Parameter(defaultValue = "${basedir}/karma.conf.js", property = "configFile", required = true)
     private File configFile;
+
+    /**
+     * Karma-junit-reporter results file. Setting this location will export the results file to the specified reportsDirectory. For this
+     * to function, the karma-junit-reporter plugin must be included in the karma configuration file and the reportsDirectory
+     * must be available for writing
+     */
+    @Parameter(property = "junitReportFile", required = false)
+    private File junitReportFile;
 
     /**
      * Path to the working directory.  The working directory should be where node_modules is installed.
@@ -126,9 +155,11 @@ public class StartMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (skipKarma || skipTests) {
-            getLog().info("Skipping execution.");
+            getLog().info("Skipping Karma test suite execution.");
             return;
         }
+
+        preExecution();
 
         final Process karma = createKarmaProcess();
 
@@ -136,11 +167,85 @@ public class StartMojo extends AbstractMojo {
             if (karmaFailureIgnore) {
                 getLog().warn("There were Karma test failures.");
             } else {
+                postExecution();
                 throw new MojoFailureException("There were Karma test failures.");
             }
         }
 
+        postExecution();
         System.out.flush();
+    }
+
+    private void preExecution() throws MojoFailureException {
+        String karmaConfiguration;
+
+        if (!configFile.exists()) {
+            throw new MojoFailureException("Cannot read the supplied Karma configuration file because it does not exist: " + configFile.getAbsolutePath());
+        }
+
+        try {
+            karmaConfiguration = FileUtils.readFileToString(configFile);
+        } catch (IOException e) {
+            throw new MojoFailureException("Cannot read the supplied Karma configuration at " + configFile.getAbsolutePath() + ". Do you have read permission?");
+        }
+
+        if (!reportsDirectory.exists() && !reportsDirectory.mkdirs()) {
+            throw new MojoFailureException("Cannot create reporting directory " + reportsDirectory.getAbsolutePath());
+        }
+
+        if (!reportsDirectory.isDirectory() || !reportsDirectory.canWrite()) {
+            throw new MojoFailureException("Cannot write to the supplied reporting directory " + reportsDirectory.getAbsolutePath());
+        }
+
+        if (junitReportFile != null) {
+            getLog().info("Enabling Karma's junit reporter plugin (" + KARMA_JUNIT_REPORTER_PLUGIN + ")");
+
+            // Ensure that the junit reporter is executed
+            if (reporters == null) {
+                if (!karmaConfiguration.contains("'" + KARMA_JUNIT_REPORTER + "'")) {
+                    reporters = KARMA_JUNIT_REPORTER;
+                }
+            } else if (!reporters.contains(KARMA_JUNIT_REPORTER)) {
+                reporters += "," + KARMA_JUNIT_REPORTER;
+            }
+
+            if (!karmaConfiguration.contains("'" + KARMA_JUNIT_REPORTER_PLUGIN + "'")) {
+                getLog().warn("Could not find the " + KARMA_JUNIT_REPORTER_PLUGIN + " plugin in the supplied configuration file. Test results may be unavailable or incorrect!");
+            }
+        }
+    }
+
+    private Process createKarmaProcess() throws MojoExecutionException {
+        final ProcessBuilder builder = KarmaUtils.getKarmaProcessBuilder(karmaExecutable, configFile.getAbsolutePath());
+
+        if (workingDirectory != null) {
+            builder.directory(workingDirectory);
+        }
+
+        final List<String> command = builder.command();
+
+        command.addAll(KarmaUtils.valueToKarmaArgument(browsers, "--browsers"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(reporters, "--reporters"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(captureTimeout, "--capture-timeout"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(colors, "--colors"));
+
+        builder.redirectErrorStream(true);
+
+        try {
+            AnsiConsole.systemInstall();
+
+            getLog().info("Executing Karma Test Suite ...");
+            System.out.println(StringUtils.join(command.iterator(), " "));
+
+            return builder.start();
+
+        } catch (IOException e) {
+            resetAnsiConsole();
+            throw new MojoExecutionException("There was an error executing Karma.", e);
+        }
     }
 
     private boolean executeKarma(final Process karma) throws MojoExecutionException {
@@ -161,98 +266,16 @@ public class StartMojo extends AbstractMojo {
         } catch (IOException e) {
             resetAnsiConsole();
             throw new MojoExecutionException("There was an error reading the output from Karma.", e);
-
         } catch (InterruptedException e) {
             resetAnsiConsole();
             throw new MojoExecutionException("The Karma process was interrupted.", e);
-
         } finally {
             IOUtils.closeQuietly(karmaOutputReader);
         }
     }
 
-    private Process createKarmaProcess() throws MojoExecutionException {
-
-        final ProcessBuilder builder;
-
-        if (isWindows()) {
-          builder = new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFile.getAbsolutePath());
-        } else {
-          builder = new ProcessBuilder(karmaExecutable, "start", configFile.getAbsolutePath());
-        }
-
-        if(workingDirectory != null) {
-          builder.directory(workingDirectory);
-        }
-
-        final List<String> command = builder.command();
-
-        command.addAll(valueToKarmaArgument(browsers, "--browsers"));
-        command.addAll(valueToKarmaArgument(reporters, "--reporters"));
-        command.addAll(valueToKarmaArgument(singleRun, "--single-run", "--no-single-run"));
-        command.addAll(valueToKarmaArgument(autoWatch, "--auto-watch", "--no-auto-watch"));
-        command.addAll(valueToKarmaArgument(captureTimeout, "--capture-timeout"));
-        command.addAll(valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
-        command.addAll(valueToKarmaArgument(colors, "--colors"));
-
-        builder.redirectErrorStream(true);
-
-        try {
-            AnsiConsole.systemInstall();
-
-            System.out.println(StringUtils.join(command.iterator(), " "));
-
-            return builder.start();
-
-        } catch (IOException e) {
-            resetAnsiConsole();
-            throw new MojoExecutionException("There was an error executing Karma.", e);
-        }
-    }
-
-    private List<String> valueToKarmaArgument(final Boolean value, final String trueSwitch, final String falseSwitch) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        if (value.booleanValue()) {
-            return Arrays.asList(trueSwitch);
-        } else {
-            return Arrays.asList(falseSwitch);
-        }
-    }
-
-    private List<String> valueToKarmaArgument(final Integer value, final String argName) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(argName, String.valueOf(value));
-    }
-
-    private List<String> valueToKarmaArgument(final Boolean value, final String argName) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(argName, value.toString());
-    }
-
-    private List<String> valueToKarmaArgument(final String value, final String argName) {
-        if (value == null) {
-            return Collections.EMPTY_LIST;
-        }
-
-        return Arrays.asList(argName, value);
-    }
-
-    private BufferedReader createKarmaOutputReader(final Process p)
-    {
+    private BufferedReader createKarmaOutputReader(final Process p) {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
-    }
-
-    private boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("windows");
     }
 
     private void resetAnsiConsole() {
@@ -260,4 +283,19 @@ public class StartMojo extends AbstractMojo {
         AnsiConsole.systemInstall();
     }
 
+    private void postExecution() {
+        if (junitReportFile != null) {
+
+            if (!junitReportFile.exists() || !junitReportFile.isFile()) {
+                getLog().warn("Karma's junit reporter was enabled but no results were found at " + junitReportFile.getAbsolutePath() + ". Is the reporter plugin (" + KARMA_JUNIT_REPORTER_PLUGIN + ") installed correctly and enabled in the Karma configuration file?");
+            } else {
+                try {
+                    FileUtils.copyFile(junitReportFile, new File(reportsDirectory, junitReportFile.getName()));
+                } catch (IOException e) {
+                    getLog().warn("Could not copy Karma's junit report to " + reportsDirectory.getAbsolutePath());
+                }
+            }
+
+        }
+    }
 }
