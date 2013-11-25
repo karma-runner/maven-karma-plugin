@@ -14,7 +14,7 @@ Example of a typical usage:
     <plugin>
         <groupId>com.kelveden</groupId>
         <artifactId>maven-karma-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.5</version>
         <executions>
             <execution>
                 <goals>
@@ -46,6 +46,10 @@ pick the default value for the corresponding argument. The exception to this rul
 set to "true" by default as this will be the most common use case in the context of a Maven build.
 
 ## Releases
+
+### Version 1.5
+
+### Version 1.4
 
 ### Version 1.3
    * Support for specifying --colors/--no-colors via new "colors" property; courtesy of [@fbengrid](https://github.com/fbengrid).
