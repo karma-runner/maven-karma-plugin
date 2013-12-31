@@ -27,6 +27,36 @@ Example of a typical usage:
         </configuration>
     </plugin>
 
+Full Example:
+
+    <plugin>
+        <groupId>com.kelveden</groupId>
+        <artifactId>maven-karma-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+            <execution>
+                <phase>test</phase>
+                <goals>
+                    <goal>start</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <configFile>src/main/webapp/resources/karma-0.10.2.conf.js</configFile>
+            <junitReportFile>src/main/webapp/resources/test-results.xml</junitReportFile>
+            <reportsDirectory>${project.build.directory}/karma-reports</reportsDirectory>
+            <browsers>PhantomJS</browsers>
+            <autoWatch>false</autoWatch>
+            <singleRun>true</singleRun>
+            <colors>true</colors>
+            <skipKarma>false</skipKarma>
+            <skipTests>false</skipTests>
+            <karmaFailureIgnore>false</karmaFailureIgnore>
+            <reporters>dots,junit</reporters>
+        </configuration>
+    </plugin>
+
+
 ## More information
 
 Just run:
