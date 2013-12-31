@@ -14,7 +14,7 @@ Example of a typical usage:
     <plugin>
         <groupId>com.kelveden</groupId>
         <artifactId>maven-karma-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <executions>
             <execution>
                 <goals>
@@ -32,7 +32,7 @@ Full Example:
     <plugin>
         <groupId>com.kelveden</groupId>
         <artifactId>maven-karma-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <executions>
             <execution>
                 <phase>test</phase>
@@ -76,6 +76,9 @@ pick the default value for the corresponding argument. The exception to this rul
 set to "true" by default as this will be the most common use case in the context of a Maven build.
 
 ## Releases
+
+### Version 1.6
+   * "Add support for detecting and exporting 'test-results.xml' for surefire integration", courtesy of [@jaymes-bearden](https://github.com/jaymes-bearden). Closes #15.
 
 ### Version 1.5
 
