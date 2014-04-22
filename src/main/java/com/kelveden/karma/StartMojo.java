@@ -35,7 +35,11 @@ import java.util.List;
 /**
  * Executes the 'start' task against Karma. See the Karma documentation itself for information: http://karma.github.com.
  */
-@Mojo(name = "start", defaultPhase = LifecyclePhase.TEST)
+@Mojo(
+        name = "start",
+        defaultPhase = LifecyclePhase.TEST,
+        threadSafe = true // see https://cwiki.apache.org/confluence/display/MAVEN/Parallel+builds+in+Maven+3#ParallelbuildsinMaven3-Mojothreadsafetyassertionchecklist
+)
 public class StartMojo extends AbstractMojo {
 
     /**
@@ -173,7 +177,7 @@ public class StartMojo extends AbstractMojo {
         }
 
         postExecution();
-        System.out.flush();
+        AnsiConsole.out.flush();
     }
 
     private void preExecution() throws MojoFailureException {
@@ -235,10 +239,8 @@ public class StartMojo extends AbstractMojo {
         builder.redirectErrorStream(true);
 
         try {
-            AnsiConsole.systemInstall();
-
             getLog().info("Executing Karma Test Suite ...");
-            System.out.println(StringUtils.join(command.iterator(), " "));
+            getLog().info(StringUtils.join(command.iterator(), " "));
 
             return builder.start();
 
@@ -280,7 +282,6 @@ public class StartMojo extends AbstractMojo {
 
     private void resetAnsiConsole() {
         AnsiConsole.out.println("\033[0m ");
-        AnsiConsole.systemInstall();
     }
 
     private void postExecution() {
