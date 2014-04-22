@@ -1,7 +1,4 @@
 # maven-karma-plugin
-> Note that this plugin began life as the [testacular-maven-plugin](https://github.com/kelveden/testacular-maven-plugin). Since Testacular itself has changed name to Karma, all subsequent development
-of the plugin will be in its new form.
-
 Provides the ability to run tests via [Karma](http://karma-runner.github.com/) as part of your Maven build.
 
 ## Usage
