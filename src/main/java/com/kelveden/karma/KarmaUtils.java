@@ -15,6 +15,7 @@
  */
 package com.kelveden.karma;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -73,10 +74,26 @@ public class KarmaUtils {
      * @return a new ProcessBuilder for the current environment for karma
      */
     public static ProcessBuilder getKarmaProcessBuilder(String karmaExecutable, String configFileWithPath) {
-        if (isWindows()) {
-            return new ProcessBuilder("cmd", "/C", karmaExecutable, "start", configFileWithPath);
-        } else {
-            return new ProcessBuilder(karmaExecutable, "start", configFileWithPath);
+        String osAgnosticPathToExe = "";
+        if(!karmaExecutable.equals(StartMojo.defaultKarmaExe)) {
+            osAgnosticPathToExe = replacePathSeparatorsWithOSAgnosticSeparator(karmaExecutable);
         }
+        if (isWindows()) {
+            return new ProcessBuilder("cmd", "/C", osAgnosticPathToExe, "start", configFileWithPath);
+        } else {
+            return new ProcessBuilder(osAgnosticPathToExe, "start", configFileWithPath);
+        }
+    }
+
+    /**
+     * Splits the path on / or \ and reconstructs the path with the file.separator character so it can be executed on
+     * any OS
+     * @param karmaExecutablePath
+     * @return reconstructed path
+     */
+    private static String replacePathSeparatorsWithOSAgnosticSeparator(String karmaExecutablePath) {
+        String deUnixedPath = karmaExecutablePath.replace("/", File.separator);
+        String deWindowsedAndDeUnixedpath = deUnixedPath.replace("\\", File.separator);
+        return deWindowsedAndDeUnixedpath;
     }
 }
