@@ -74,7 +74,7 @@ public class KarmaUtils {
      * @return a new ProcessBuilder for the current environment for karma
      */
     public static ProcessBuilder getKarmaProcessBuilder(String karmaExecutable, String configFileWithPath) {
-        String osAgnosticPathToExe = "";
+        String osAgnosticPathToExe = karmaExecutable;
         if(!karmaExecutable.equals(StartMojo.defaultKarmaExe)) {
             osAgnosticPathToExe = replacePathSeparatorsWithOSAgnosticSeparator(karmaExecutable);
         }
