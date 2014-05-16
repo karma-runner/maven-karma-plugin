@@ -42,6 +42,8 @@ import java.util.List;
 )
 public class StartMojo extends AbstractMojo {
 
+    static final String defaultKarmaExe = "karma";
+
     /**
      * Name of the Junit reporter for the Karma configuration reporters array
      *
@@ -57,7 +59,8 @@ public class StartMojo extends AbstractMojo {
     private static final String KARMA_JUNIT_REPORTER_PLUGIN = "karma-junit-reporter";
 
     /**
-     * Base directory where all Karma reports are written to.
+     * Base directory where all Karma reports are written to. This occurs in the post execution step where the file
+     * specified in the junitReportFile is copied to this directory.
      */
     @Parameter(defaultValue = "${project.build.directory}/karma-reports", required = false)
     private File reportsDirectory;
@@ -71,7 +74,8 @@ public class StartMojo extends AbstractMojo {
     /**
      * Karma-junit-reporter results file. Setting this location will export the results file to the specified reportsDirectory. For this
      * to function, the karma-junit-reporter plugin must be included in the karma configuration file and the reportsDirectory
-     * must be available for writing
+     * must be available for writing. The junit reporter plugin's outputFile property should also be configured in karma.conf.js to
+     * be pointing to the same directory as this property, ensuring that the file is picked up.
      */
     @Parameter(property = "junitReportFile", required = false)
     private File junitReportFile;
@@ -153,7 +157,7 @@ public class StartMojo extends AbstractMojo {
     @Parameter(property = "karmaFailureIgnore", required = false, defaultValue = "false")
     private Boolean karmaFailureIgnore;
 
-    @Parameter(property = "karmaExecutable", required = false, defaultValue = "karma")
+    @Parameter(property = "karmaExecutable", required = false, defaultValue = defaultKarmaExe)
     private String karmaExecutable;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
