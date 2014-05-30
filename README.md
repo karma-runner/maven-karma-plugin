@@ -39,6 +39,7 @@ Full Example:
             </execution>
         </executions>
         <configuration>
+            <karmaExecutable>${basedir}/node_modules/.bin/karma</karmaExecutable>        
             <configFile>src/main/webapp/resources/karma-0.10.2.conf.js</configFile>
             <junitReportFile>src/main/webapp/resources/test-results.xml</junitReportFile>
             <reportsDirectory>${project.build.directory}/karma-reports</reportsDirectory>
@@ -53,6 +54,7 @@ Full Example:
         </configuration>
     </plugin>
 
+(In particular, note the use of the `karmaExecutable` property that implies that the karma executable installed to the local node_modules folder will be used instead of the globally installed version.)
 
 ## More information
 
@@ -72,27 +74,8 @@ Note also that if a property isn't specified in the POM it will not be passed to
 pick the default value for the corresponding argument. The exception to this rule is the "singleRun" property which is
 set to "true" by default as this will be the most common use case in the context of a Maven build.
 
-## Releases
-
-### Version 1.6
-   * "Add support for detecting and exporting 'test-results.xml' for surefire integration", courtesy of [@jaymes-bearden](https://github.com/jaymes-bearden). Closes #15.
-
-### Version 1.5
-
-### Version 1.4
-
-### Version 1.3
-   * Support for specifying --colors/--no-colors via new "colors" property; courtesy of [@fbengrid](https://github.com/fbengrid).
-
-### Version 1.2
-   * Support for skipTests.
-
-### Version 1.1
-   * Support for Windows, courtesy of [@Nikku](https://github.com/Nikku). _Closes issues #3, #5, #6._
-   * New karmaFailureIgnore property that acts in a similar way to the maven-surefire-plugin testFailureIgnore property. _Closes issue #4._
-
-### Version 1.0
-   * Initial release.
+### Using a local karma installation
+By default, the plugin assumes that karma is installed globally via `npm install -g karma`. However, if you prefer to use a locally installed karma you can do so by telling the plugin where to find it with the `karmaExecutable` configuration property; e.g. `${basedir}/node_modules/.bin/karma`. (See the full example pom configuration above.)
 
 ## Contributing
 
