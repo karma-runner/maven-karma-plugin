@@ -82,7 +82,7 @@ public class KarmaUtils {
         if (isWindows()) {
             return new ProcessBuilder("cmd", "/C", osAgnosticPathToExe, "start", configFileWithPath);
         } else {
-            List<String> commands= new ArrayList<>(Arrays.asList(osAgnosticPathToExe.split("\\s+")));
+            List<String> commands= new ArrayList<String>(Arrays.asList(osAgnosticPathToExe.split("\\s+")));
             commands.add("start");
             commands.add(configFileWithPath);
             return new ProcessBuilder(commands);
