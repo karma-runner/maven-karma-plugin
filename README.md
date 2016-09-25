@@ -2,6 +2,8 @@
 
 Provides the ability to run tests via [Karma](http://karma-runner.github.com/) as part of your Maven build.
 
+> It has been years since I used this plugin and, quite honestly given the lack of use and activity on it, I'd almost forgot that it even existed. Consequently, I have no wish to continue to maintain the project. If someone wishes to pick up the project I'm more than happy to hand over the reins to someone with more use for it. Alternatively, just fork it.
+
 ## Usage
 
 Note that the plugin expects Karma (and nodejs of course) to have been installed beforehand and for the `karma`
