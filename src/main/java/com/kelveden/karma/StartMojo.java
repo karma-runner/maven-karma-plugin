@@ -15,14 +15,6 @@
  */
 package com.kelveden.karma;
 
-import static org.codehaus.plexus.util.StringUtils.join;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -33,6 +25,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.StringUtils;
 import org.fusesource.jansi.AnsiConsole;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * Executes the 'start' task against Karma. See the Karma documentation itself for information: http://karma.github.com.
@@ -162,6 +160,12 @@ public class StartMojo extends AbstractMojo {
     @Parameter(property = "karmaExecutable", required = false, defaultValue = defaultKarmaExe)
     private String karmaExecutable;
 
+    /**
+     * Override the Hostname to be used when capturing browsers. 
+     */
+    @Parameter(property = "hostname", required = false, defaultValue = "localhost")
+    private String hostname;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (skipKarma || skipTests) {
@@ -223,11 +227,6 @@ public class StartMojo extends AbstractMojo {
                 getLog().warn("Could not find the " + KARMA_JUNIT_REPORTER_PLUGIN + " plugin in the supplied configuration file. Test results may be unavailable or incorrect!");
             }
         }
-
-        if(StringUtils.isNotEmpty(browsers)){
-        	String[] browser = browsers.split("[\\s]*,[\\s]*");
-        	browsers = join(browser, ",");
-        }
     }
 
     private Process createKarmaProcess() throws MojoExecutionException {
@@ -246,6 +245,7 @@ public class StartMojo extends AbstractMojo {
         command.addAll(KarmaUtils.valueToKarmaArgument(captureTimeout, "--capture-timeout"));
         command.addAll(KarmaUtils.valueToKarmaArgument(reportSlowerThan, "--report-slower-than"));
         command.addAll(KarmaUtils.valueToKarmaArgument(colors, "--colors"));
+        command.addAll(KarmaUtils.valueToKarmaArgument(hostname, "--hostname"));
 
         builder.redirectErrorStream(true);
 
