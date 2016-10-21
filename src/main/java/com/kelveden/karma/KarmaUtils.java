@@ -18,6 +18,7 @@ package com.kelveden.karma;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -81,7 +82,10 @@ public class KarmaUtils {
         if (isWindows()) {
             return new ProcessBuilder("cmd", "/C", osAgnosticPathToExe, "start", configFileWithPath);
         } else {
-            return new ProcessBuilder(osAgnosticPathToExe, "start", configFileWithPath);
+            List<String> commands= new ArrayList<String>(Arrays.asList(osAgnosticPathToExe.split("\\s+")));
+            commands.add("start");
+            commands.add(configFileWithPath);
+            return new ProcessBuilder(commands);
         }
     }
 
