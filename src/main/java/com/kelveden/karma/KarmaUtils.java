@@ -80,7 +80,7 @@ public class KarmaUtils {
         }
         String quotedConfigFilePath = "\"" + configFileWithPath + "\"";
         if (isWindows()) {
-            return new ProcessBuilder("cmd", "/C", osAgnosticPathToExe, "start", quotedConfigFilePath);
+            return new ProcessBuilder("cmd", "/C", "\"", osAgnosticPathToExe, "start", quotedConfigFilePath, "\"");
         } else {
             return new ProcessBuilder(osAgnosticPathToExe, "start", quotedConfigFilePath);
         }
