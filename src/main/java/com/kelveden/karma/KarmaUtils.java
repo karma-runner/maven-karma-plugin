@@ -78,10 +78,11 @@ public class KarmaUtils {
         if(!karmaExecutable.equals(StartMojo.defaultKarmaExe)) {
             osAgnosticPathToExe = replacePathSeparatorsWithOSAgnosticSeparator(karmaExecutable);
         }
+        String quotedConfigFilePath = "\"" + configFileWithPath + "\"";
         if (isWindows()) {
-            return new ProcessBuilder("cmd", "/C", osAgnosticPathToExe, "start", configFileWithPath);
+            return new ProcessBuilder("cmd", "/C", osAgnosticPathToExe, "start", quotedConfigFilePath);
         } else {
-            return new ProcessBuilder(osAgnosticPathToExe, "start", configFileWithPath);
+            return new ProcessBuilder(osAgnosticPathToExe, "start", quotedConfigFilePath);
         }
     }
 
