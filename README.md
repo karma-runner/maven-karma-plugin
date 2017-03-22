@@ -85,7 +85,7 @@ set to "true" by default as this will be the most common use case in the context
 
 ### Using a local karma installation
 
-By default, the plugin assumes that karma is installed globally via `npm install -g karma`. However, if you prefer to use a locally installed karma you can do so by telling the plugin where to find it with the `karmaExecutable` configuration property; e.g. `${basedir}/node_modules/.bin/karma`. (See the full example pom configuration above.)
+By default, the plugin assumes that karma is installed globally via `npm install -g karma-cli`. However, if you prefer to use a locally installed karma you can do so by telling the plugin where to find it with the `karmaExecutable` configuration property; e.g. `${basedir}/node_modules/.bin/karma`. (See the full example pom configuration above.)
 
 ## Contributing
 
